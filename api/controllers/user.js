@@ -47,6 +47,53 @@ class User {
       }
     }
   }
+
+  static async login(req, res, next) {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()) {
+      return res.status(422).json({
+        error: 'validation failed',
+        statusCode: 422,
+        data: errors.mapped()
+      })
+    }
+    try {
+      const email = req.body.email
+      const password = req.body.password
+      const user = await UserModel.findOne({ email: email })
+      const doMatch = await bcrypt.compare(password, user.password)
+      if(!doMatch) {
+        return res.status(404).json({
+          response: 'invalid email & password',
+          statusCode: 404
+        })
+      }
+      const token = jwt.sign(
+        { userId: user._id, 
+          name: `${user.firstName} ${user.lastName}` 
+        },
+        process.env.TOKEN_SECRET,
+        { expiresIn: '2h' }
+      )
+      res.status(200).json({
+        data: {
+          token,
+          name: `${user.firstName} ${user.lastName}`
+        },
+        statusCode: 200
+      })
+
+    }
+    catch(err) {
+      if(!err.statusCode) {
+        err.message = 'internal server error'
+        next(err)
+      }
+    }
+    
+
+    
+  }
 }
 
 module.exports = User
