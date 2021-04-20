@@ -46,4 +46,29 @@ router.post(
   userController.addUser  
 )
 
+router.post(
+  '/login',
+  [
+    body('email')
+      .isEmail()
+      .notEmpty()
+      .normalizeEmail()
+      .trim()
+      .custom((value, { req }) => {
+        return User
+          .findOne({ email: value })
+          .then(user => {
+            if(!user) {
+              return Promise.reject('user not found')
+            }
+          })
+      }),
+    body('password')
+      .notEmpty()
+      .trim()
+      .isLength({ min: 8 })
+  ],
+  userController.login
+)
+
 module.exports = router
