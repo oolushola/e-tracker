@@ -14,9 +14,10 @@ class middleware {
       let token = userToken.split(' ')[1]
       const user = jwt.verify(token, process.env.TOKEN_SECRET)
       if(!user) {
+        console.log('error')
         const error = new Error('unverifiable token')
         error.statusCode = 400
-        throw error
+        throw next(error)
       }
       req.userId = user.userId
       req.userName = user.name
