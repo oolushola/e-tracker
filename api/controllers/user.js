@@ -2,8 +2,43 @@ const UserModel = require('../models/user')
 const { validationResult } = require('express-validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const multer = require('multer')
+const crypto = require('crypto')
+const path = require('path')
+const fs = require('fs')
 
-class User {
+const fileStorage = multer.diskStorage({
+  filename: (req, file, cb) => {
+    const name = crypto.randomBytes(8).toString('hex')
+    const photoExt = file.originalname.split('.')[1]
+    const photoName = name+'.'+photoExt
+    cb(null, photoName)
+  },
+  destination: (req, file, cb) => {
+    cb(null, 'public/users')
+  }
+})
+
+const fileFilter = (req, file, cb) => {
+  if(
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/jpeg' ||
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/gif'
+  ) {
+    cb(null, true)
+  }
+  else {
+    cb(null, false)
+  }
+}
+
+const uploadPhoto = multer({ 
+  storage: fileStorage, 
+  fileFilter: fileFilter 
+}).single('photo')
+
+class userController {
   static async addUser(req, res, next) {
     try {
       const errors = validationResult(req)
@@ -90,10 +125,59 @@ class User {
         next(err)
       }
     }
-    
+  }
 
-    
+  static async uploadPhoto(req, res, next) {
+    const userId = req.userId
+    const errors = validationResult(req)
+    if(!errors.isEmpty()) {
+      const error = new Error('validation failed')
+      error.statusCode = 422
+      return next(error)
+    }
+    let result;
+    try {
+      const photo = req.file
+      if(!photo) {
+        const error = new Error('no photo')
+        error.statusCode = 422
+        return next(error)
+      }
+      const photoUrl = req.file.path
+      const user = await UserModel.findById(userId)   
+      if(user.photo) {
+        deletePhoto(user.photo)
+      }   
+      user.photo = photoUrl
+      result = await user.save()
+      res.status(200).json({
+        status: 200,
+        data: result
+      })
+    }
+    catch(err) {
+      if(!err.statusCode) {
+        next(err)
+      }
+    }
   }
 }
 
-module.exports = User
+const deletePhoto = (photoPath) => {
+  const photoDir = path.join(__dirname, '..', photoPath)
+  return fs.unlink(photoDir, (err, data) => {
+    if(err) {
+      console.log('Error deleting file: ', err)
+    }
+    else {
+      console.log('DELETED')
+    }
+  })
+
+  console.log(rootDir)
+}
+
+module.exports = {
+  userController,
+  uploadPhoto
+}

@@ -1,7 +1,8 @@
 const express = require('express')
 const { body} = require('express-validator')
 const User = require('../../models/user')
-const userController = require('../../controllers/user')
+const { userController, uploadPhoto } = require('../../controllers/user')
+const { verifyToken } = require('../../middleware/middleware')
 
 const router = express.Router()
 
@@ -69,6 +70,16 @@ router.post(
       .isLength({ min: 8 })
   ],
   userController.login
+)
+
+router.patch(
+  '/upload-photo',
+  verifyToken,
+  // [
+  //   body('photo')
+  // ],
+  uploadPhoto,
+  userController.uploadPhoto
 )
 
 module.exports = router

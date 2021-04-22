@@ -2,6 +2,8 @@ const express = require('express')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const router = require('./routes/route')
+const path = require('path')
+const fs = require('fs')
 const dotenv = require('dotenv')
 dotenv.config()
 
@@ -10,6 +12,7 @@ const PORT = process.env.PORT || 8081
 const CONNECTION_STRING = process.env.MONGO_URI
 const BASE_URL = process.env.BASE_URL
 
+app.use('/public/users', express.static(path.join(__dirname,  'public/users')))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true}))
 
