@@ -3,8 +3,12 @@
   "version": "1.0.0",
   "description": "an expense tracker application ",
   "main": "app.js",
+  "engines": {
+    "node": "12.10.*"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
     "dev": "nodemon --experimental-modules app.js"
   },
   "repository": {
