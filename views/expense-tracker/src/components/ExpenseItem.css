@@ -1,0 +1,50 @@
+.expenseItem {
+  width: 500px;
+  height: 70px;
+  background:#666;
+  margin: 5px auto;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.expenseItem__description {
+  width: 65%;
+  border: 1px solid #000;
+  border-radius: 5px;
+  float: right;
+  text-align: right;
+}
+
+.expenseItem__description h2 {
+  font-size: 18px;
+  margin:0;
+  padding: 0;
+}
+
+.expenseDate {
+  width: 17%;
+  border-radius: 5px;
+  float: left;
+  position: relative;
+  background: mediumseagreen;
+  margin:5px;
+  height: inherit;
+}
+
+.expenseDate__month {
+  font-size:13px;
+  font-weight: bold;
+  margin: 2px
+}
+
+.expenseDate__day {
+  font-size: 20px;
+  margin: 2px;
+}
+
+.expenseDate__year {
+ font-size: 19px;
+ font-weight: bold;
+}
+
+
